@@ -27,7 +27,7 @@ import cors from "cors";
   const discord = await page.goto("https://discord.com/login");
   try {
     const base64 = await page
-      .waitForSelector('[alt="Scan me!"]', { timeout: 5 })
+      .waitForSelector('[alt="Scan me!"]')
       .then(async () => {
         return await page.$eval('[alt="Scan me!"]', (el) => el.src);
       });
