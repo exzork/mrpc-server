@@ -6,6 +6,7 @@ import express from "express";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import cors from "cors";
+import request_promise from "request-promise-native";
 
 (async () => {
   dotenv.config();
@@ -15,7 +16,7 @@ import cors from "cors";
 
   const browser = await puppeteer.launch({
     userDataDir: "./userData",
-    headless: true,
+    headless: false,
     defaultViewport: null,
     args: ["--start-maximized", "--no-sandbox"],
   });
@@ -25,7 +26,17 @@ import cors from "cors";
   }
   const page = await browser.newPage();
   const discord = await page.goto("https://discord.com/login");
+  let token;
+  await page.setRequestInterception(true);
+  page.on("request", (request) => {
+    if (request.headers().authorization != undefined) {
+      console.log("token : " + request.headers().authorization);
+      token = request.headers().authorization;
+    }
+    request.continue();
+  });
   try {
+    console.log("Checking login state");
     const base64 = await page
       .waitForSelector('[alt="Scan me!"]')
       .then(async () => {
@@ -35,33 +46,17 @@ import cors from "cors";
       base64.replace(/^data:image\/\w+;base64,/, ""),
       "base64"
     );
+    console.log("Saving discord.png");
     fs.writeFileSync("discord.png", buff);
   } catch (e) {
-    const leveldb_dir = fs.readdirSync(
-      "./userData/Default/Local Storage/leveldb/"
-    );
-    let log_file;
-    leveldb_dir.forEach((element) => {
-      if (element.endsWith(".log")) {
-        log_file = element;
-      }
-    });
-
-    console.log(log_file);
-
-    const log_data = fs
-      .readFileSync(`./userData/Default/Local Storage/leveldb/${log_file}`)
-      .toString();
-
-    let token = log_data.substring(log_data.indexOf("token>") + 8);
-    token = token.substring(token.indexOf(':"') + 2, token.indexOf('"}'));
-    console.log("token : " + token);
-
+    console.log("Server online : ");
     let app = express();
     app.use(bodyParser.json({ limit: "10mb" }));
     app.use(cors());
 
     app.post("/upload", async (req, res) => {
+      let body = req.body;
+      console.log("request : " + JSON.stringify(body));
       const response = await fetch(
         "https://discord.com/api/v9/oauth2/applications/" +
           DISCORD_CLIENT_ID +
@@ -73,10 +68,12 @@ import cors from "cors";
             Authorization: token,
           },
           method: "POST",
-          body: JSON.stringify(req.body),
+          body: JSON.stringify(body),
         }
       );
-      res.send(await response.json());
+      let response_body = await response.json();
+      console.log("response : " + JSON.stringify(await response_body));
+      res.send(await response_body);
     });
 
     app.listen(3000);
