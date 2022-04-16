@@ -1,4 +1,4 @@
-FROM node:16-slim
+FROM buildkite/puppeteer
 ADD . /mrpc-server
 WORKDIR /mrpc-server
 RUN npm install
