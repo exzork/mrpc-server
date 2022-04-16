@@ -14,7 +14,7 @@ import cors from "cors";
 
   const browser = await puppeteer.launch({
     userDataDir: "./userData",
-    headless: false,
+    headless: true,
     defaultViewport: null,
     args: ["--start-maximized", "--no-sandbox"],
   });
