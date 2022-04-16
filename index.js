@@ -1,12 +1,10 @@
 import puppeteer from "puppeteer";
 import fetch from "node-fetch";
-import FormData from "form-data";
 import fs from "fs";
 import express from "express";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import cors from "cors";
-import request_promise from "request-promise-native";
 
 (async () => {
   dotenv.config();
