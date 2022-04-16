@@ -5,6 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    command: node index.js
     volumes:
       - .:/mrpc-server
       - /mrpc-server/node_modules
