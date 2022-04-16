@@ -17,7 +17,7 @@ import cors from "cors";
     userDataDir: "./userData",
     headless: true,
     defaultViewport: null,
-    args: ["--start-maximized"],
+    args: ["--start-maximized", "--no-sandbox"],
   });
 
   if (fs.existsSync("./discord.png")) {
