@@ -47,6 +47,8 @@ import cors from "cors";
       }
     });
 
+    console.log(log_file);
+
     const log_data = fs
       .readFileSync(`./userData/Default/Local Storage/leveldb/${log_file}`)
       .toString();
